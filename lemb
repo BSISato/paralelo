@@ -1,0 +1,26 @@
+criar pasta e comando npm install
+npm install express --save
+npm install --save-dev nodemon
+npm run dev
+npm install
+mongo db
+criar pasta e inicializar C:\data\db
+baixar https://gitforwindows.org/
+verificar mongo db relacionamento 
+pesquisar denormalization
+
+-----------------------------
+crud produtos
+- getall
+- post
+- getbyid
+- put
+- delete
+
+localhost:3000/api/produtos/getbyid/dfsdfdfdsf
+
+
+localhost:3000/api/produtos/delete/
+
+
+localhost:3000/api/produtos/put/
