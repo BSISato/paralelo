@@ -1,11 +1,13 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var pessoaSchema = new Schema({
+var alunoSchema = new Schema({
+    _id: String,
+    ra: Number,
     nome: String,
     idade: Number,
-    peso: Number
+    curso_id: String
 });
 
-module.exports = mongoose.model('Pessoa',pessoaSchema);
+module.exports = mongoose.model('Aluno',alunoSchema);
 

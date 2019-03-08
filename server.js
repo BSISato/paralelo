@@ -5,7 +5,8 @@ const app = express();
 
 var mongoose = require('mongoose');
 var Produto = require('./app/models/product');
-var Pessoa = require('./app/models/person');
+var Aluno = require('./app/models/person');
+var Curso = require('./app/models/curso');
 
 //PERSISTENCIA 
 mongoose.connect('mongodb://localhost/bdCruddd', { useNewUrlParser: true } );
@@ -45,22 +46,54 @@ router.route('/produtos')
                 res.status(201).json({message:'Produto inserido com sucesso'});
         });
     })
-//testando a inserção de mais de um documento
-router.route('/pessoa')
+//testando testando testando testando testando
+router.route('/aluno')
     .post(function(req, res){
-        var pessoa = new Pessoa();
-        pessoa.nome = req.body.nome;
-        pessoa.idade = req.body.idade;
-        pessoa.peso = req.body.peso;
+        var aluno = new Aluno();
+        aluno._id = req.body._id;
+        aluno.ra = req.body.ra;
+        aluno.nome = req.body.nome;
+        aluno.idade = req.body.idade;
+        aluno.curso_id = req.body.curso_id;
 
-        pessoa.save(function(error){
+        aluno.save(function(error){
             if(error)
-                res.send("Erro ao tentar salvar a pessoa" +error);
+                res.send("Erro ao tentar salvar o aluno" +error);
 
-                res.status(201).json({message:'Pessoa inserida com sucesso'});
+                res.status(201).json({message:'Aluno inserido com sucesso'});
         });
     })
+    //testando testando testando testando testando
+    router.route('/curso')
+    .post(function(req, res){
+        var curso = new Curso();
+        curso._id = req.body._id;
+        curso.nome = req.body.nome;
+        curso.duracao = req.body.duracao;
+        curso.coordenador = req.body.coordenador;
+        
 
+        curso.save(function(error){
+            if(error)
+                res.send("Erro ao tentar salvar o curso" +error);
+
+                res.status(201).json({message:'Curso inserido com sucesso'});
+        });
+    })
+//testando get
+    router.route('/aluno/:id')
+        .get(function(req,res){
+            var id = req.params.id
+                Aluno.findById(id,function(err,lunos){
+                    if(err)
+                    req.send(err);
+                
+                    res.status(200).json({
+                        message:"Aluno:" ,
+                        alunos:lunos
+                })  ;  
+            });
+        })
 
         //rota de get 
   router.route('/produtos')
