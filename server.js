@@ -1,5 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import { emitKeypressEvents } from 'readline';
 
 const app = express();
 
@@ -32,20 +33,6 @@ router.use(function (req, res, next) {
 
 router.get('/', (req, res) => res.json({'message': 'rota teste ok'}));
 
-router.route('/produtos')
-    .post(function(req, res){
-        var produto = new Produto();
-        produto.nome = req.body.nome;
-        produto.preco = req.body.preco;
-        produto.descricao = req.body.descricao;
-
-        produto.save(function(error){
-            if(error)
-                res.send("Erro ao tentar salvar o produto"+ error);
-
-                res.status(201).json({message:'Produto inserido com sucesso'});
-        });
-    })
 //testando testando testando testando testando
 router.route('/aluno')
     .post(function(req, res){
@@ -71,6 +58,7 @@ router.route('/aluno')
         curso.nome = req.body.nome;
         curso.duracao = req.body.duracao;
         curso.coordenador = req.body.coordenador;
+        curso.coordenador_adjunto = req.body.coordenador_adjunto;
         
 
         curso.save(function(error){
@@ -80,49 +68,72 @@ router.route('/aluno')
                 res.status(201).json({message:'Curso inserido com sucesso'});
         });
     })
-//testando get
-    router.route('/aluno/:id')
+//testando get em documentos relacionados
+    router.route('/aluno/:ra')
         .get(function(req,res){
-            var id = req.params.id
-                Aluno.findById(id,function(err,lunos){
-                    if(err)
+            var ra = {ra: req.params.ra}
+            //traz o aluno do RA digitado
+            Aluno.find(ra,function(err,aluno){
+                if(err)
                     req.send(err);
-                
-                    res.status(200).json({
-                        message:"Aluno:" ,
-                        alunos:lunos
-                })  ;  
-            });
+                else{
+                    //traz o id do curso do aluno do RA digitado
+                    var idCurso = aluno.map(function(a){
+                        return a.curso_id;
+                    })
+                    //traz o curso baseado no id do curso do documento do aluno do RA
+                    Curso.find({_id:{$in:idCurso}},function(err,cursoAluno){
+                        if(err)
+                            req.send(err);
+                            res.status(200).json({
+                                message:"Aluno e Curso" ,                       
+                                alunos:aluno,
+                                curso:cursoAluno                                
+                        });  
+                    });
+                }
+            })         
         })
-
         //rota de get 
-  router.route('/produtos')
+        //lista todos alunos
+  router.route('/alunos')
         .get(function(req,res){
-            Produto.find(function(err,prods){
+            Aluno.find(function(err,als){
                 if(err)
                     req.send(err);
 
             res.status(200).json({
-                message:"Produtos retornados.",
-                produtos:prods
+                message:"Alunos retornados.",
+                alunos:als
             })  ;  
         });
-
   })
+  router.route('/cursos')
+        .get(function(req,res){
+            Curso.find(function(err,crs){
+                if(err)
+                    req.send(err);
+
+                res.status(200).json({
+                    message:"Cursos retornados: ",
+                    cursos:crs
+                })
+            })
+        })
   
   //rota de get by id 
-  router.route('/produtos/getbyid/:uid')
+  router.route('/aluno/ById/:id')
   
   .get(function(req,res){
-    var uid = req.params.uid
-        Produto.findById(uid,function(err,prods){
+    var id = req.params.id
+        Aluno.findById(id,function(err,als){
             if(err)
              req.send(err);
             
 
             res.status(200).json({
-                message:"Produto:" ,
-                produtos:prods
+                message:"Aluno:" ,
+                produtos:als
             })  ;  
         });
 
@@ -168,7 +179,6 @@ app.listen(port, () => {
 
 });
 
-//postman ????
 //livro GANG OF FOUR PATTERN
 
 
