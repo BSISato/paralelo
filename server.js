@@ -33,7 +33,6 @@ router.use(function (req, res, next) {
 
 router.get('/', (req, res) => res.json({'message': 'rota teste ok'}));
 
-//testando testando testando testando testando
 router.route('/aluno')
     .post(function(req, res){
         var aluno = new Aluno();
@@ -50,8 +49,8 @@ router.route('/aluno')
                 res.status(201).json({message:'Aluno inserido com sucesso'});
         });
     })
-    //testando testando testando testando testando
-    router.route('/curso')
+
+router.route('/curso')
     .post(function(req, res){
         var curso = new Curso();
         curso._id = req.body._id;
@@ -60,7 +59,6 @@ router.route('/aluno')
         curso.coordenador = req.body.coordenador;
         curso.coordenador_adjunto = req.body.coordenador_adjunto;
         
-
         curso.save(function(error){
             if(error)
                 res.send("Erro ao tentar salvar o curso" +error);
@@ -68,7 +66,7 @@ router.route('/aluno')
                 res.status(201).json({message:'Curso inserido com sucesso'});
         });
     })
-//testando get em documentos relacionados
+//get no RA traz info do aluno e seu curso
     router.route('/aluno/:ra')
         .get(function(req,res){
             var ra = {ra: req.params.ra}
@@ -81,7 +79,7 @@ router.route('/aluno')
                     var idCurso = aluno.map(function(a){
                         return a.curso_id;
                     })
-                    //traz o curso baseado no id do curso do documento do aluno do RA
+                    //traz o curso pelo id do curso do documento do RA pesquisado
                     Curso.find({_id:{$in:idCurso}},function(err,cursoAluno){
                         if(err)
                             req.send(err);
@@ -94,9 +92,31 @@ router.route('/aluno')
                 }
             })         
         })
-        //rota de get 
-        //lista todos alunos
-  router.route('/alunos')
+    //get no curso traz os alunos relacionados
+    router.route('/curso/:id')
+    .get(function(req,res){
+        var id = {_id: req.params.id}
+        //traz o curso 
+        Curso.find(id,function(err,cursoPesquisa){
+            if(err)
+                req.send(err);
+            else{
+                //traz os alunos baseado no id do curso pesquisado
+                Aluno.find({curso_id:{$in:id}},function(err,alunoCurso){
+                    if(err)
+                        req.send(err);
+                        res.status(200).json({
+                            message:"Aluno e Curso" ,                       
+                            curso:cursoPesquisa,
+                            alunos:alunoCurso                                
+                    });  
+                });
+            }
+        })         
+    })
+    //rota de get 
+    //lista todos alunos
+    router.route('/alunos')
         .get(function(req,res){
             Aluno.find(function(err,als){
                 if(err)
@@ -108,6 +128,7 @@ router.route('/aluno')
             })  ;  
         });
   })
+    //lista todos os cursos
   router.route('/cursos')
         .get(function(req,res){
             Curso.find(function(err,crs){
@@ -122,6 +143,7 @@ router.route('/aluno')
         })
   
   //rota de get by id 
+  //busca aluno pelo ID
   router.route('/aluno/ById/:id')
   
   .get(function(req,res){
@@ -130,44 +152,42 @@ router.route('/aluno')
             if(err)
              req.send(err);
             
-
             res.status(200).json({
                 message:"Aluno:" ,
                 produtos:als
             })  ;  
         });
-
   })
 
   //rota de delete
-  router.route('/produtos/delete/:deleteid')
+  //Deleta aluno por ID
+  router.route('/aluno/delete/:id')
   
   .post(function(req,res){
-    var deleteid = {adress:deleteid}
-        Produto.deleteOne(deleteid,function(err,prods){
+    var id = {_id: req.params.id}
+        Aluno.deleteOne(id,function(err,alunoDeleta){
             if(err)
             req.send(err);
 
             res.status(200).json({
-                message:"Produtos Deletado.",
-                //produtos:prods
+                message:"Aluno Deletado.",
+                
             })  ;  
         });
-
   })
 
   //rota put
-  router.route('/produtos/put/:id')
+  //altera aluno por ID
+  router.route('/aluno/put/:id')
   
   .put(function(req,res){
-        Produto.findByIdAndUpdate({ _id: req.params.id }, req.body ,function(err,prods){
+        Aluno.findByIdAndUpdate({ _id: req.params.id }, req.body ,function(err,alunoAltera){
             if(err)
             req.send(err);
 
             res.status(200).json({
-                message:"Produtos Atualizado.",
-                produtos:prods
-            })  ;  
+                message:"Cad Aluno Atualizado.",
+            });  
         });
   })
   
